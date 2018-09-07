@@ -8,6 +8,10 @@ Experimental style guide generator for use primarily with Style-O-Matic
 ### Full wiki coming soon.
 
 ## Contributors
+
+```
+```
+
 ## License
 Copyright (c) 2018 Steven Jackson
 

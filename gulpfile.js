@@ -1,6 +1,5 @@
 var gulp = require("gulp");
 var eslint = require("gulp-eslint");
-var contribs = require("gulp-contribs");
 var del = require("del");
 
 gulp.task("test:clean", function() {
@@ -14,12 +13,5 @@ gulp.task("test:run", function() {
     .pipe(eslint.format());
 });
 
-gulp.task("test:contribs", function() {
-  gulp
-    .src("README.md")
-    .pipe(contribs())
-    .pipe(gulp.dest("./test/output/"));
-});
-
-gulp.task("test", gulp.series("test:clean", "test:run", "test:contribs"));
-gulp.task("default", gulp.series("test:clean", "test:run", "test:contribs"));
+gulp.task("test", gulp.series("test:clean", "test:run"));
+gulp.task("default", gulp.series("test:clean", "test:run"));
