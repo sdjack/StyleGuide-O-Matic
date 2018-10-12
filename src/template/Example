@@ -1,0 +1,15 @@
+/* ========================================================================
+ * Style-O-Matic UI
+ *
+ * @author: Steven Jackson
+ * ======================================================================== */
+import React from "react";
+import <%= name %> from "./<%= name %>";
+
+const <%= name %>Example = () => (
+  <<%= name %>>
+    Example Content
+  </<%= name %>>
+);
+
+export default <%= name %>Example;

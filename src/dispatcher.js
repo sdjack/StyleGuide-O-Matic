@@ -19,46 +19,35 @@ const defaultConfig = {};
  * @memberof dispatcher
  */
 function Dispatcher(config) {
-  this._settings = _.extend(defaultConfig, config || {});
+  this._settings = config;
   this._registry = {};
   this._queue = [];
+
   this._queue.push(function(callback) {
-    callback(null, { sourceFile: [] });
+    callback(null, { sourceFile: [], sourceFiles: {} });
   });
-}
 
-/**
- * Register a source file to be processed
- * @function register
- * @param {File} file - The source file
- * @return {Function} callback - Callback
- * @memberof dispatcher
- */
-Dispatcher.prototype.register = function(file) {
-  const self = this;
-  const sourceFileObject = getSourceFileObject(file, self._settings);
-  const id = sourceFileObject.id;
-  if (!self._registry[id]) {
-    self._registry[id] = true;
-    self._queue.push(function(data, callback) {
-      sourceFileObject.compile(function(err, sourceFileData) {
-        data.sourceFile.push(sourceFileData);
-        callback(err, data);
+  this.register = function(file) {
+    const self = this;
+    const sourceFileObject = getSourceFileObject(file, self._settings);
+    const id = sourceFileObject.id;
+    if (!self._registry[id]) {
+      self._registry[id] = true;
+      self._queue.push(function(data, callback) {
+        sourceFileObject.compile(function(err, sourceFileData) {
+          data.sourceFile.push(sourceFileData);
+          data.sourceFiles[sourceFileData.name] = sourceFileData;
+          callback(err, data);
+        });
       });
-    });
-  }
-};
+    }
+  };
 
-/**
- * Run all queued processes
- * @function compile
- * @param {Function} callback - Post compile callback
- * @memberof dispatcher
- */
-Dispatcher.prototype.compile = function(callback) {
-  const self = this;
-  async.waterfall(self._queue, callback);
-};
+  this.compile = function(callback) {
+    const self = this;
+    async.waterfall(self._queue, callback);
+  };
+}
 
 /**
  * Misc helper func

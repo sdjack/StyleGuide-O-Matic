@@ -1,0 +1,14 @@
+<%= name %>
+================
+<%= description %>
+---
+**Typical render usage:**
+
+```
+<%= example %>
+```
+
+## License
+Copyright (c) 2018 Steven Jackson
+
+Licensed under the MIT license.
