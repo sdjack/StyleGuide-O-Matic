@@ -49,6 +49,7 @@
     "console-o-matic": "^1.0.0",
     "gulp-strip-comments": "^2.5.2",
     "lodash": "^4.17.10",
+    "mathsass": "^0.10.1",
     "node-sass": "^4.9.3",
     "q": "1.4.1",
     "sass-extract": "^2.1.0",

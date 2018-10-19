@@ -9,10 +9,17 @@ var path = require("path");
 var async = require("async");
 var fs = require("fs");
 var through = require("through2");
+var sass = require("node-sass");
+var sassExtract = require("sass-extract");
 var getDispatcher = require("./dispatcher").getDispatcher;
 var getSourceFileObject = require("./object").getSourceFileObject;
 var PLUGIN_NAME = "StyleGuide-O-Matic";
 var CoM = require("console-o-matic");
+var stylePathArray = [
+  "../Style-O-Matic/src/scss/abstracts/",
+  "../Style-O-Matic/src/scss/base/",
+  "../Style-O-Matic/src/scss/"
+]
 CoM.setName(PLUGIN_NAME);
 
 /**
@@ -25,8 +32,10 @@ CoM.setName(PLUGIN_NAME);
  */
 var options = {
   examples: false,
-  guidePath: "../../styleguide",
-  srcPath: ""
+  styles: false,
+  guidePath: "../../Style-O-Matic.wiki",
+  srcPath: "../../Style-O-Matic.wiki/examples",
+  stylePath: "../../Style-O-Matic.wiki/styles"
 };
 
 /**
@@ -80,7 +89,7 @@ function makeTemplateFile(fileName, template, filePath, stream, data) {
   try {
     var compiled = _.template(template);
     out = compiled(data);
-    CoM.log(`Generating ${fileName} for ${data.name} in ${filePath}`);
+    CoM.log(`Generating ${fileName} in ${filePath}`);
   } catch (e) {
     deferred.reject(e);
     CoM.warn(e);
@@ -125,6 +134,22 @@ function writeExampleFiles(stream, data, config) {
   makeTemplateFile(fileName, template, filePath, stream, data);
 }
 
+/**
+ * Misc helper func
+ * @function writeStyleFiles
+ * @param {Stream} stream
+ * @param {Object} data
+ * @param {Object} config
+ * @memberof converter
+ */
+function writeStyleFiles(stream, scssPath, data, config) {
+  var fileName = `${data.name}.md`;
+  var template = fs.readFileSync(__dirname + "/template/StyleReadMe", "utf-8");
+  var filePath = `./${config.stylePath}/${fileName}`;
+  var rendered = sassExtract.renderSync({ file: scssPath });
+  makeTemplateFile(fileName, template, filePath, stream, rendered);
+}
+
 module.exports = function(config) {
   config = _.merge(_.cloneDeep(options), config || {});
 
@@ -135,7 +160,9 @@ module.exports = function(config) {
       var stream = this;
       var fileName = path.basename(file.path, path.extname(file.path));
       var fileObject = getSourceFileObject(file, config);
-      if (config.examples) {
+      if (config.styles) {
+        writeStyleFiles(stream, file.path, fileObject.data, config);
+      } else if (config.examples) {
         writeExampleFiles(stream, fileObject.data, config);
       } else {
         writeGuideFiles(stream, fileObject.data, config);

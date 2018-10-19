@@ -1,0 +1,19 @@
+Style-O-Matic UI
+================
+##### SCSS Analysis
+---
+```scss
+<%Object.entries(vars.global).forEach(([name,data])=>{if(data.type==='SassString'||data.type==='SassNumber'){%><%=name%>: <%=data.value%>
+<%}else if(data.type==='SassColor'){%><%=name%>: rgba(<%=data.value.r%>,<%=data.value.g%>,<%=data.value.b%>,<%=data.value.a%>)
+<%}else if(data.type==='SassList'){%><%=name%>: <%_.forEach(data.value, (item) => {if(item.type==='SassString'||item.type==='SassNumber'){%>, <%=item.value%><%}});%>
+<%}else if(data.type==='SassMap'){%><%=name%>: {<%Object.entries(data.value).forEach(([itemName,itemData]) => {if(itemData.type==='SassString'||itemData.type==='SassNumber'){%>
+    <%=itemName%>: <%=itemData.value%><%}else if(itemData.type==='SassList'){%>
+    <%=itemName%>: <%_.forEach(itemData.value, (subItem) => {if(subItem.type==='SassString'||subItem.type==='SassNumber'){%>, <%=subItem.value%><%}});}});%> }
+<%}else{%><%=name%>: <%=data.type%>
+<%}});%>
+```
+
+## License
+Copyright (c) 2018 Steven Jackson
+
+Licensed under the MIT license.

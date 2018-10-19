@@ -18,13 +18,12 @@ function SourceFileObject(file, config) {
   this._path = file.path;
   this._contents = file.contents.toString();
   this.id = path.basename(file.path, path.extname(file.path));
-  console.log(this._settings);
-  this.data = getSourceFileData(file.path, this._contents, this._settings.examples);
+  this.data = getSourceFileData(file.path, this._contents, this._settings);
   this.compile = function(callback) {
     const self = this;
     try {
       console.log(self._settings);
-      const sourceFileData = getSourceFileData(self._path, self._contents, self._settings.examples);
+      const sourceFileData = getSourceFileData(self._path, self._contents, self._settings);
       process.nextTick(function() {
         callback(null, sourceFileData);
       });

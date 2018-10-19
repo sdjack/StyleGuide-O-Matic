@@ -24,24 +24,31 @@ const PATTERNS = {
  * @function SourceFileData
  * @memberof data
  */
-function SourceFileData(filePath, contents, examples) {
+function SourceFileData(filePath, contents, options) {
   const self = this;
-  const pkg = JSON.parse(contents);
-  Object.entries(pkg).forEach(([attr, val]) => {
-    self[attr] = val;
-  });
-  if (!self.description) {
+  if (options.styles) {
+    self.name = path.basename(filePath, path.extname(filePath));
+    self.version = "0.0.0";
     self.description = `${self.name}: ver.${self.version} `;
-  }
-  if (!examples) {
-    let exampleContents = fs.readFileSync(path.dirname(filePath) + "/Example.js", "utf-8");
-    exampleContents = exampleContents.replace(/((?:\/\*){1}[\w\d\s\W\S]*?(?:\*\/){1})|((?:\/\/){1}[\w\d\s\W]*?(?:[\r\n]))/g, "");
-    exampleContents = exampleContents.replace(/(\n+(?![^\n]))/gm, "");
-    self.example = exampleContents.replace(/^([\w\s\S\W\r\n]+)(?:const)/g, "const");
+    self.example = "";
   } else {
-    self.example = `<${self.name}>
-      Example Content
-    </${self.name}>`;
+    const pkg = JSON.parse(contents);
+    Object.entries(pkg).forEach(([attr, val]) => {
+      self[attr] = val;
+    });
+    if (!self.description) {
+      self.description = `${self.name}: ver.${self.version} `;
+    }
+    if (options.styles) {
+      self.example = `<${self.name}>
+        Example Content
+      </${self.name}>`;
+    } else {
+      let exampleContents = fs.readFileSync(path.dirname(filePath) + "/Example.js", "utf-8");
+      exampleContents = exampleContents.replace(/((?:\/\*){1}[\w\d\s\W\S]*?(?:\*\/){1})|((?:\/\/){1}[\w\d\s\W]*?(?:[\r\n]))/g, "");
+      exampleContents = exampleContents.replace(/(\n+(?![^\n]))/gm, "");
+      self.example = exampleContents.replace(/^([\w\s\S\W\r\n]+)(?:const)/g, "const");
+    }
   }
 }
 
