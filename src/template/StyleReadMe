@@ -1,6 +1,5 @@
-Style-O-Matic UI
+SCSS Analysis
 ================
-##### SCSS Analysis
 ---
 ```scss
 <%Object.entries(vars.global).forEach(([name,data])=>{if(data.type==='SassString'||data.type==='SassNumber'){%><%=name%>: <%=data.value%>
@@ -12,8 +11,8 @@ Style-O-Matic UI
 <%}else{%><%=name%>: <%=data.type%>
 <%}});%>
 ```
-
-## License
+---
+**Created using StyleGuide-O-Matic**
+##### License
 Copyright (c) 2018 Steven Jackson
-
 Licensed under the MIT license.

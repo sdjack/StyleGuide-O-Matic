@@ -4,6 +4,7 @@
  */
 const fs = require("fs");
 const path = require("path");
+const CoM = require("console-o-matic");
 /**
  * Stored RegExp patterns used for parsing svg file data
  * @constant {Object} PATTERNS
@@ -26,12 +27,14 @@ const PATTERNS = {
  */
 function SourceFileData(filePath, contents, options) {
   const self = this;
-  if (options.styles) {
-    self.name = path.basename(filePath, path.extname(filePath));
-    self.version = "0.0.0";
-    self.description = `${self.name}: ver.${self.version} `;
-    self.example = "";
-  } else {
+  self.name = filePath;
+  self.version = "0.0.0";
+  self.description = "";
+  self.example = "";
+  self.styles = {vars: {}, css: ""};
+  const extension = path.extname(filePath);
+  if (extension === ".json") {
+    // CoM.log(`Parsing ${extension} file: ${filePath}`);
     const pkg = JSON.parse(contents);
     Object.entries(pkg).forEach(([attr, val]) => {
       self[attr] = val;
@@ -39,7 +42,7 @@ function SourceFileData(filePath, contents, options) {
     if (!self.description) {
       self.description = `${self.name}: ver.${self.version} `;
     }
-    if (options.styles) {
+    if (options.examples) {
       self.example = `<${self.name}>
         Example Content
       </${self.name}>`;

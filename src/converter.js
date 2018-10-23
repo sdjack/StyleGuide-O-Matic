@@ -15,41 +15,75 @@ var getDispatcher = require("./dispatcher").getDispatcher;
 var getSourceFileObject = require("./object").getSourceFileObject;
 var PLUGIN_NAME = "StyleGuide-O-Matic";
 var CoM = require("console-o-matic");
-var stylePathArray = [
-  "../Style-O-Matic/src/scss/abstracts/",
-  "../Style-O-Matic/src/scss/base/",
-  "../Style-O-Matic/src/scss/"
-]
+
 CoM.setName(PLUGIN_NAME);
 
 /**
  * Default configuration. Everything here can be overridden
  * @constant {Object} options
- * @property {Boolean} options.async - Use async processing
- * @property {String} options.srcPath - Define the svg output file path.
- * @property {Function} options.postProcess - Apply additional data changes AFTER core processes
+ * @property {Boolean} options.examples - Generate example boilerplate files
+ * @property {Boolean} options.styles - Generate sass extractions.
+ * @property {String} options.dest - Output directory.
+ * @property {Object} options.src - Source file location data
+ * @property {Array} options.componentList - List of component names to be included
  * @memberof converter
  */
 var options = {
   examples: false,
   styles: false,
-  guidePath: "../../Style-O-Matic.wiki",
-  srcPath: "../../Style-O-Matic.wiki/examples",
-  stylePath: "../../Style-O-Matic.wiki/styles"
+  dest: "",
+  src: {
+    root: "",
+    components: null,
+    styles: null
+  },
+  componentList: []
 };
 
 /**
- * Path correction helper
- * @function getCleanPath
+ * Verify that file is included
+ * @function checkIncluded
  * @param {String} pathValue
- * @param {Stream} fileValue
- * @return {String} Usable path
+ * @param {Array} pathList
+ * @return {Boolean} valid
  * @memberof converter
  */
-function getCleanPath(pathValue, fileValue) {
-  var p = pathValue.replace(/\/$/, "");
-  var s = p.length > 0 ? "/" : "";
-  return `${p}${s}${fileValue}`;
+function checkIncluded(pathValue, pathList) {
+  var valid = false;
+  _.forEach(pathList, (name) => {
+    if (pathValue.indexOf(name) !== -1) {
+      valid = true;
+    }
+  });
+  return valid;
+}
+
+/**
+ * Misc helper func
+ * @function prepareStyleData
+ * @param {Object} styleData
+ * @return {Object} output
+ * @memberof converter
+ */
+function prepareStyleData(styleData) {
+  var output = {};
+  console.log(styleData.vars.global["$animation-curve-fast-out-linear-in"]);
+  Object.entries(styleData.vars.global).forEach(
+    ([name,data])=>{
+      if (data.declarations && data.declarations.length > 0) {
+        _.forEach(data.declarations, (decData) => {
+          if (decData.in) {
+            var fileName = path.basename(decData.in, path.extname(decData.in));
+            if (!output[fileName]) {
+              output[fileName] = {global: []};
+            }
+            output[fileName].global.push(data);
+          }
+        });
+      }
+    });
+
+  return output;
 }
 
 /**
@@ -89,7 +123,7 @@ function makeTemplateFile(fileName, template, filePath, stream, data) {
   try {
     var compiled = _.template(template);
     out = compiled(data);
-    CoM.log(`Generating ${fileName} in ${filePath}`);
+    // CoM.log(`Generating ${fileName} in ${filePath}`);
   } catch (e) {
     deferred.reject(e);
     CoM.warn(e);
@@ -112,11 +146,21 @@ function makeTemplateFile(fileName, template, filePath, stream, data) {
  * @param {Object} config
  * @memberof converter
  */
-function writeGuideFiles(stream, data, config) {
-  var fileName = `${data.name}.md`;
+function writeGuideFiles(stream, file, config) {
+  var fileName = `${file.data.name}.md`;
   var template = fs.readFileSync(__dirname + "/template/ComponentReadMe", "utf-8");
-  var filePath = getCleanPath(config.guidePath, fileName);
-  makeTemplateFile(fileName, template, filePath, stream, data);
+  var filePath = path.join(config.dest, fileName);
+  if (config.src.styles) {
+    var stylePath = path.join(config.src.styles, `components/${file.data.name}/loader.scss`);
+    if (fs.existsSync(stylePath)) {
+      file.data.styles = sassExtract.renderSync({ file: stylePath });
+      var cssSource = file.data.styles.css.toString();
+      cssSource = cssSource.replace(/((?:\/\*){1}[\w\d\s\W\S]*?(?:\*\/){1})|((?:\/\/){1}[\w\d\s\W]*?(?:[\r\n]))/g, "");
+      cssSource = cssSource.replace(/(\n+(?![^\n]))/gm, "");
+      file.data.styles.css = cssSource;
+    }
+  }
+  makeTemplateFile(fileName, template, filePath, stream, file.data);
 }
 
 /**
@@ -127,11 +171,13 @@ function writeGuideFiles(stream, data, config) {
  * @param {Object} config
  * @memberof converter
  */
-function writeExampleFiles(stream, data, config) {
+function writeExampleFiles(stream, file, config) {
   var fileName = "Example.js";
   var template = fs.readFileSync(__dirname + "/template/Example", "utf-8");
-  var filePath = `./${config.srcPath}/${data.name}/${fileName}`;
-  makeTemplateFile(fileName, template, filePath, stream, data);
+  var filePath = path.join(config.dest, file.id, fileName);
+  makeTemplateFile(fileName, template, filePath, stream, file.data);
+
+  return file.data;
 }
 
 /**
@@ -142,34 +188,53 @@ function writeExampleFiles(stream, data, config) {
  * @param {Object} config
  * @memberof converter
  */
-function writeStyleFiles(stream, scssPath, data, config) {
-  var fileName = `${data.name}.md`;
+function writeStyleFiles(stream, file, config, cb) {
+  var fileName = `${file.id}.md`;
   var template = fs.readFileSync(__dirname + "/template/StyleReadMe", "utf-8");
-  var filePath = `./${config.stylePath}/${fileName}`;
-  var rendered = sassExtract.renderSync({ file: scssPath });
+  var filePath = path.join(config.dest, fileName);
+  var rendered = sassExtract.renderSync({ file: file.path });
   makeTemplateFile(fileName, template, filePath, stream, rendered);
+  if (cb) {
+    return cb(file.data);
+  }
+
+  return file.data;
 }
 
 module.exports = function(config) {
   config = _.merge(_.cloneDeep(options), config || {});
 
   CoM.log("Working...");
+  var dispatcher = getDispatcher(config);
 
   return through.obj(
     function(file, enc, cb) {
       var stream = this;
-      var fileName = path.basename(file.path, path.extname(file.path));
-      var fileObject = getSourceFileObject(file, config);
-      if (config.styles) {
-        writeStyleFiles(stream, file.path, fileObject.data, config);
-      } else if (config.examples) {
-        writeExampleFiles(stream, fileObject.data, config);
-      } else {
-        writeGuideFiles(stream, fileObject.data, config);
+      if (file.contents && checkIncluded(file.path, config.componentList)) {
+        // dispatcher.register(file);
+        const extension = path.extname(file.path);
+        const fileObject = getSourceFileObject(file, config);
+        if (extension === ".json" && fileObject.data) {
+          if (config.examples) {
+            writeExampleFiles(stream, fileObject, config);
+          } else {
+            writeGuideFiles(stream, fileObject, config);
+          }
+        }
       }
       cb(null);
     },
     function(cb) {
+      // var stream = this;
+      // dispatcher.compile(function(err, fileObject) {
+      //   if (fileObject.data) {
+      //     if (config.examples) {
+      //       writeExampleFiles(stream, fileObject, config);
+      //     } else {
+      //       writeGuideFiles(stream, fileObject, config, styleData);
+      //     }
+      //   }
+      // });
       CoM.log("Work Complete");
       cb(null);
     }

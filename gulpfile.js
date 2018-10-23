@@ -2,38 +2,98 @@ var gulp = require("gulp");
 var eslint = require("gulp-eslint");
 var del = require("del");
 var styleGuideOMatic = require("./src/converter");
-
+var srcRoot = "../Style-O-Matic/src";
+var destRoot = "../Style-O-Matic.wiki";
+var cList = [
+  "Accordion",
+  "Badge",
+  "Breadcrumbs",
+  "Button",
+  "ButtonBar",
+  "Card",
+  "DatePicker",
+  "Drawer",
+  "Dropdown",
+  "Footer",
+  "Form",
+  "Grid",
+  "Header",
+  "Input",
+  "Main",
+  "Loading",
+  "Modal",
+  "Nav",
+  "Pagination",
+  "Pill",
+  "Radio",
+  "Select",
+  "Table",
+  "Tabs",
+  "Textarea",
+  "Title",
+  "Toasts",
+  "ToolBar",
+  "ToolTip"
+];
 gulp.task("clean", function() {
-  return del(["../Style-O-Matic/src/components/**/README.md", "../Style-O-Matic/styleguide/**.md"], {force: true});
+  return del([`${srcRoot}/components/**/README.md`, `${destRoot}/*`], {force: true});
 });
 
 gulp.task("generate", function() {
   return gulp
-    .src(["../Style-O-Matic/src/components/**/package.json"])
-    .pipe(styleGuideOMatic({examples: false}))
-    .pipe(gulp.dest("../Style-O-Matic/styleguide"));
+    .src([`${srcRoot}/**/*`])
+    .pipe(styleGuideOMatic({
+      examples: false,
+      src: {
+        root: srcRoot,
+        components: "components",
+        styles: `${srcRoot}/scss`
+      },
+      dest: destRoot,
+      componentList: cList
+    }))
+    .pipe(gulp.dest(destRoot));
 });
 
 gulp.task("examples:clean", function() {
-  return del(["../Style-O-Matic.wiki/examples/*.js", "../Style-O-Matic.wiki/examples/*.md"], {force: true});
+  return del([`${destRoot}/examples/*`], {force: true});
 });
 
 gulp.task("examples:generate", function() {
   return gulp
-    .src(["../Style-O-Matic/src/components/**/package.json"])
-    .pipe(styleGuideOMatic({examples: true}))
-    .pipe(gulp.dest("../Style-O-Matic.wiki/examples"));
+    .src([`${srcRoot}/components/**/package.json`])
+    .pipe(styleGuideOMatic({
+      examples: true,
+      src: {
+        root: srcRoot,
+        components: "components",
+        styles: `${srcRoot}/scss`
+      },
+      dest: destRoot,
+      componentList: cList
+    }))
+    .pipe(gulp.dest(`${destRoot}/examples`));
 });
 
 gulp.task("styles:clean", function() {
-  return del(["../Style-O-Matic.wiki/styles/*.scss", "../Style-O-Matic.wiki/styles/*.md"], {force: true});
+  return del([`${destRoot}/styles/*`], {force: true});
 });
 
 gulp.task("styles:generate", function() {
   return gulp
-    .src(["../Style-O-Matic/src/scss/main.scss"])
-    .pipe(styleGuideOMatic({styles: true}))
-    .pipe(gulp.dest("../Style-O-Matic.wiki/styles"));
+    .src([`${srcRoot}/scss/main.scss`])
+    .pipe(styleGuideOMatic({
+      examples: false,
+      styles: true,
+      src: {
+        root: srcRoot,
+        components: "components",
+        styles: `${srcRoot}/scss`
+      },
+      dest: destRoot,
+      componentList: cList
+    }))
+    .pipe(gulp.dest(`${destRoot}/styles`));
 });
 
 gulp.task("test:clean", function() {

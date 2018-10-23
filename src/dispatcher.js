@@ -29,17 +29,19 @@ function Dispatcher(config) {
 
   this.register = function(file) {
     const self = this;
-    const sourceFileObject = getSourceFileObject(file, self._settings);
-    const id = sourceFileObject.id;
-    if (!self._registry[id]) {
-      self._registry[id] = true;
-      self._queue.push(function(data, callback) {
-        sourceFileObject.compile(function(err, sourceFileData) {
-          data.sourceFile.push(sourceFileData);
-          data.sourceFiles[sourceFileData.name] = sourceFileData;
-          callback(err, data);
+    if (file.contents) {
+      const sourceFileObject = getSourceFileObject(file, self._settings);
+      const id = sourceFileObject.id;
+      if (!self._registry[id]) {
+        self._registry[id] = true;
+        self._queue.push(function(data, callback) {
+          sourceFileObject.compile(function(err, src) {
+            data.sourceFile.push(src);
+            data.sourceFiles[src.id] = src;
+            callback(err, data);
+          });
         });
-      });
+      }
     }
   };
 

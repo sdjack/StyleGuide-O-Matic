@@ -5,9 +5,13 @@
 var vfs = require("vinyl-fs");
 var converter = require("./src/converter");
 
-module.exports = function(...args) {
+module.exports = function(config) {
+  var srcRoot = config.src.root;
+  var destRoot = config.dest;
   vfs
-    .src(["src/components/**/package.json"])
-    .pipe(converter(...args))
-    .pipe(vfs.dest("src/components"));
+    .src([`${srcRoot}/**/*`])
+    .pipe(converter(config))
+    .pipe(vfs.dest(destRoot));
 };
+
+module.exports.gulpPlugin = converter;
