@@ -1,6 +1,6 @@
 {
   "name": "styleguide-o-matic",
-  "version": "1.0.0",
+  "version": "1.0.24",
   "description": "Experimental style guide generator for use primarily with Style-O-Matic",
   "main": "index.js",
   "engines": {
@@ -46,14 +46,15 @@
   "dependencies": {
     "async": "^2.6.1",
     "colors": "^1.3.0",
-    "console-o-matic": "^1.0.0",
+    "console-o-matic": "^1.3.0",
+    "find": "^0.2.9",
     "gulp-strip-comments": "^2.5.2",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.11",
     "mathsass": "^0.10.1",
-    "node-sass": "^4.9.3",
+    "node-sass": "^4.9.4",
     "q": "1.4.1",
     "sass-extract": "^2.1.0",
-    "sassdoc": "^2.5.0",
+    "sassdoc": "^2.5.1",
     "through2": "2.0.1",
     "vinyl": "1.2.0"
   }
