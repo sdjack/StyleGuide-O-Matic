@@ -31,25 +31,24 @@ const PATTERNS = {
  */
 function SourceFileData(filePath, contents, options) {
   const self = this;
-  self.name = filePath;
+  self.name = "Global";
   self.version = "0.0.0";
   self.description = "";
   self.example = "";
   self.styles = {vars: { global: {}}, css: ""};
   const symbols = new RegExp(PATTERNS.docFlags, "gim");
   let parsed;
-  let scssPath = false;
   while ((parsed = symbols.exec(contents)) !== null) {
     if (parsed[1] && parsed[2]) {
-      if (parsed[1] === "external" && parsed[2] === "scssdir") {
-        scssPath = true
-      } else if (scssPath) {
+      if (parsed[1] === "scss") {
         self.scssPath = parsed[2].trim();
-        scssPath = false;
       } else {
         self[parsed[1]] = parsed[2].trim();
       }
     }
+  }
+  if (self.namespace) {
+    self.name = self.namespace;
   }
   if (!self.description) {
     self.description = `${self.name}: ver.${self.version} `;
