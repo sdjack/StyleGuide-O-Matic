@@ -1,21 +1,32 @@
 {
-    "source": {
-        "exclude": ["node_modules"],
-        "excludePattern": "(^|\\/|\\\\)_"
-    },
-    "templates": {
-        "cleverLinks": false,
-        "monospaceLinks": false,
-        "systemName": "styleguide-o-matic",
-        "copyright":  "2018",
-        "includeDate": false,
-        "navType": "inline",
-        "theme": "simplex",
-        "linenums": true,
-        "collapseSymbols": false,
-        "inverseNav": true,
-        "outputSourceFiles": true,
-        "outputSourcePath": false,
-        "syntaxTheme": "default"
-    }
+  "source": {
+      "include": ["src"],
+      "exclude": ["node_modules"],
+      "includePattern": ".+\\.js(doc|x)?$",
+      "excludePattern": "(^|\\/|\\\\)_"
+  },
+  "tags": {
+    "allowUnknownTags": true
+  },
+  "plugins": ["plugins/markdown"],
+  "templates": {
+    "logoFile": "",
+    "cleverLinks": false,
+    "monospaceLinks": false,
+    "dateFormat": "ddd MMM Do YYYY",
+    "outputSourceFiles": true,
+    "outputSourcePath": true,
+    "systemName": "Docs",
+    "footer": "",
+    "copyright": "StyleGuide-O-Matic © 2018, DocStrap © 2012-2015.",
+    "linenums": true,
+    "search": false,
+    "collapseSymbols": false,
+    "protocol": "html://",
+    "methodHeadingReturns": false
+  },
+  "markdown": {
+    "parser": "gfm",
+    "hardwrap": true
+  }
 }
