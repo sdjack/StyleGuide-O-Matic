@@ -1,6 +1,6 @@
 {
   "name": "styleguide-o-matic",
-  "version": "1.0.24",
+  "version": "1.0.37",
   "description": "Experimental style guide generator for use primarily with Style-O-Matic",
   "main": "index.js",
   "engines": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "gulp test && mocha --recursive test/specs",
-    "docs": "jsdoc ../Style-O-Matic/src -c ./jsdoc.config.json -d ./docs -t ./templates/jsdoc -R README.md -r .",
+    "docs": "jsdoc ../Style-O-Matic/src -c ./jsdoc.config.json -d ../Style-O-Matic/docs -t ./templates/jsdoc -R README.md -r .",
     "gulp": "gulp"
   },
   "repository": {
