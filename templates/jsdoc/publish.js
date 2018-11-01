@@ -355,7 +355,7 @@ function buildNav(members) {
   if (members.modules.length) {
     members.modules.forEach(function(m) {
       if (!hasOwnProp.call(seen, m.longname)) {
-        nav.module.members.push(linkto(m.longname, m.longname.replace("module:", ""), "ui-nav-item-content"));
+        nav.module.members.push(linkto(m.longname, m.longname.replace("module:", ""), "ui-nav-content"));
       }
       seen[m.longname] = true;
     });
@@ -364,7 +364,7 @@ function buildNav(members) {
   if (members.externals.length) {
     members.externals.forEach(function(e) {
       if (!hasOwnProp.call(seen, e.longname)) {
-        nav.external.members.push(linkto(e.longname, e.name.replace(/(^"|"$)/g, ""), "ui-nav-item-content"));
+        nav.external.members.push(linkto(e.longname, e.name.replace(/(^"|"$)/g, ""), "ui-nav-content"));
       }
       seen[e.longname] = true;
     });
@@ -373,7 +373,7 @@ function buildNav(members) {
   if (members.classes.length) {
     members.classes.forEach(function(c) {
       if (!hasOwnProp.call(seen, c.longname)) {
-        nav.class.members.push(linkto(c.longname, c.longname.replace("module:", ""), "ui-nav-item-content"));
+        nav.class.members.push(linkto(c.longname, c.longname.replace("module:", ""), "ui-nav-content"));
       }
       seen[c.longname] = true;
     });
@@ -382,7 +382,7 @@ function buildNav(members) {
   if (members.events.length) {
     members.events.forEach(function(e) {
       if (!hasOwnProp.call(seen, e.longname)) {
-        nav.event.members.push(linkto(e.longname, e.longname.replace("module:", ""), "ui-nav-item-content"));
+        nav.event.members.push(linkto(e.longname, e.longname.replace("module:", ""), "ui-nav-content"));
       }
       seen[e.longname] = true;
     });
@@ -391,7 +391,7 @@ function buildNav(members) {
   if (members.namespaces.length) {
     members.namespaces.forEach(function(n) {
       if (!hasOwnProp.call(seen, n.longname)) {
-        nav.namespace.members.push(linkto(n.longname, n.longname.replace("module:", ""), "ui-nav-item-content"));
+        nav.namespace.members.push(linkto(n.longname, n.longname.replace("module:", ""), "ui-nav-content"));
       }
       seen[n.longname] = true;
     });
@@ -400,7 +400,7 @@ function buildNav(members) {
   if (members.mixins.length) {
     members.mixins.forEach(function(m) {
       if (!hasOwnProp.call(seen, m.longname)) {
-        nav.mixin.members.push(linkto(m.longname, m.longname.replace("module:", ""), "ui-nav-item-content"));
+        nav.mixin.members.push(linkto(m.longname, m.longname.replace("module:", ""), "ui-nav-content"));
       }
       seen[m.longname] = true;
     });
@@ -409,7 +409,7 @@ function buildNav(members) {
   if (members.interfaces && members.interfaces.length) {
     members.interfaces.forEach(function(m) {
       if (!hasOwnProp.call(seen, m.longname)) {
-        nav.interface.members.push(linkto(m.longname, m.longname.replace("module:", ""), "ui-nav-item-content"));
+        nav.interface.members.push(linkto(m.longname, m.longname.replace("module:", ""), "ui-nav-content"));
       }
       seen[m.longname] = true;
     });
@@ -424,14 +424,14 @@ function buildNav(members) {
   if (members.globals.length) {
     members.globals.forEach(function(g) {
       if (g.kind !== "typedef" && !hasOwnProp.call(seen, g.longname)) {
-        nav.global.members.push(linkto(g.longname, g.longname.replace("module:", ""), "ui-nav-item-content"));
+        nav.global.members.push(linkto(g.longname, g.longname.replace("module:", ""), "ui-nav-content"));
       }
       seen[g.longname] = true;
     });
 
     // even if there are no links, provide a link to the global page.
     if (nav.global.members.length === 0) {
-      nav.global.members.push(linkto("global", "Global", "ui-nav-item-content"));
+      nav.global.members.push(linkto("global", "Global", "ui-nav-content"));
     }
   }
 
