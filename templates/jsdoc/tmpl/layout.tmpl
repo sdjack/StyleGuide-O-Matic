@@ -25,7 +25,6 @@
        </div>
        <?js this.nav.topLevelNav.forEach(function(entry){ ?>
          <div class="ui-nav-item">
-            <i class="ui-nav-icon ui-icon-add"></i>
             <div class="ui-nav-content" role="presentation">
               <?js= entry.title ?>
             </div>
@@ -34,7 +33,6 @@
                <?js entry.members.forEach(function(member){ ?>
                  <div class="ui-nav-item active">
                     <?js= member ?>
-                    <span class="ui-nav-icon ui-icon-star"></span>
                  </div>
                <?js	}); ?>
              </div>
